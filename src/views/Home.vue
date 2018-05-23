@@ -38,9 +38,10 @@ export default {
         }
         console.log('logged in FB')
         getFbAPI(function (profile) {
+          console.log('----after fb api', profile)
           axios
             .post(
-              'http://localhost:3000/users/signin',
+              'https://powerful-refuge-28791.herokuapp.com/users/signin',
               {
                 isFb: true,
                 name: profile.name,

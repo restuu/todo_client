@@ -18,15 +18,19 @@
 
     </b-form>
 
-    <div class="mt-3">
-      <b-list-group class="row" v-for="todo in todos" :key="todo">
+    <div class="mt-3" id="todo-list">
+
+      <small class="text-muted">mark task as complete before delete</small>
+      <small class="text-muted">click on task title to mark as complete</small>
+      
+      <b-list-group class="row" v-for="todo in todos" :key="todo" >
         <b-list-group-item 
           class="col-6 col-lg-5 mx-auto text-left"
           :class="{ completed: todo.isCompleted }"
-          @click="completeTodo(todo._id)"
           > 
-          <h5>{{ todo.title }}</h5>
-          <small class="text-muted">{{ todo.desc }}</small>
+          <h5 @click="completeTodo(todo._id)">{{ todo.title }}</h5>
+          <small class="text-muted">{{ todo.desc }}</small> <br>
+          <b-btn class="col-4" @click="deleteTodo(todo._id)">delete</b-btn>
         </b-list-group-item>
       </b-list-group>
     </div>
@@ -65,7 +69,7 @@ export default {
       let self = this
       axios({
         method: 'get',
-        url: 'http://localhost:3000/todos',
+        url: 'https://powerful-refuge-28791.herokuapp.com/todos',
         headers: {
           'token': localStorage.token
         }
@@ -74,6 +78,11 @@ export default {
           console.log('-----response',response.data)
           self.name = response.data.user.name
           self.todos = response.data.user.todos
+          console.log('before sort', self.todos)
+          self.todos.sort((a, b) => {
+            return new Date(a.createdAt) - new Date(b.createdAt)
+          })
+          console.log('after sort', self.todos)
         })
       .catch(err => {
         handlingErr(err)
@@ -83,7 +92,7 @@ export default {
     addNewTodo () {
       let self = this
       axios({
-        url: 'http://localhost:3000/todos/add',
+        url: 'https://powerful-refuge-28791.herokuapp.com/todos/add',
         method: 'post',
         data: {
           title: self.newTitle,
@@ -105,7 +114,7 @@ export default {
     completeTodo (todoId) {
       let self = this
       axios({
-        url: 'http://localhost:3000/todos/complete',
+        url: 'https://powerful-refuge-28791.herokuapp.com/todos/complete',
         method: 'put',
         data: {
           token: localStorage.token,
@@ -119,6 +128,22 @@ export default {
       .catch(err => {
         handlingErr(err)
       })
+    },
+
+    deleteTodo (todoId) {
+      let self = this
+      axios({
+        url: `https://powerful-refuge-28791.herokuapp.com/todos/delete?todoId=${todoId}`,
+        method: 'delete',
+        headers: {
+          'token': localStorage.token
+        }
+      })
+      .then(({data}) => {
+        console.log('delete todo', data)
+        self.getTodos()
+      })
+      .catch(err => handlingErr(err))
     }
   },
 
@@ -132,6 +157,7 @@ export default {
 <style lang="scss">
   .list {
     max-width: 50rem;
+    margin: auto;
   }
 
   .completed {

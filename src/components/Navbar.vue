@@ -1,7 +1,7 @@
 <template>
   <b-navbar toggleable="md" type="dark" variant="dark">
 
-    <b-navbar-brand href="#">ToDo</b-navbar-brand>
+    <b-navbar-brand :to="{name: 'home'}">ToDo</b-navbar-brand>
 
     <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
