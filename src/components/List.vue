@@ -4,14 +4,14 @@
     <h3 class="mt-3"> Welcome {{ name }} </h3>
     <p v-if="todos.length === 0"> You don't have any todo list yet </p>
 
-    <b-form class="mt-2">
+    <b-form class="mt-2 col-sm-6 mx-auto">
 
-      <div class="mx-auto">
-        <label for="newTitle">Title:</label>
+      <div class="mx-auto mb-2">
+        <!-- <label for="newTitle">Title:</label> -->
         <b-form-input id="newTitle" v-model="newTitle" placeholder="enter todo title" required/>
       </div>
-      <div class="mx-auto">
-        <label for="newDesc">Desc:</label>
+      <div class="mx-auto mb-2">
+        <!-- <label for="newDesc">Desc:</label> -->
         <b-form-input id="newDesc" v-model="newDesc" placeholder="enter todo description"/>
       </div>
       <b-button variant="primary" @click="addNewTodo">Submit</b-button>
@@ -19,18 +19,26 @@
     </b-form>
 
     <div class="mt-3" id="todo-list">
-
-      <small class="text-muted">mark task as complete before delete</small>
-      <small class="text-muted">click on task title to mark as complete</small>
       
-      <b-list-group class="row" v-for="todo in todos" :key="todo" >
+      <div id="note" v-show="todos.length > 0">
+        <small class="text-muted">mark task as complete before delete</small> <br>
+        <small class="text-muted">click on task title to mark as complete</small>
+      </div>
+      
+      <b-list-group class="row" v-for="todo in todos" :key="todo._id" >
         <b-list-group-item 
           class="col-6 col-lg-5 mx-auto text-left"
           :class="{ completed: todo.isCompleted }"
           > 
-          <h5 @click="completeTodo(todo._id)">{{ todo.title }}</h5>
-          <small class="text-muted">{{ todo.desc }}</small> <br>
-          <b-btn class="col-4" @click="deleteTodo(todo._id)">delete</b-btn>
+          <div>
+            <h5 @click="completeTodo(todo._id)">
+              {{ todo.title }} 
+              <b-btn class="float-right" size="sm" @click="deleteTodo(todo._id)">delete</b-btn>
+            </h5>
+          </div>
+
+          <small class="text-muted">{{ todo.desc }}</small>
+
         </b-list-group-item>
       </b-list-group>
     </div>
@@ -69,20 +77,17 @@ export default {
       let self = this
       axios({
         method: 'get',
-        url: 'https://powerful-refuge-28791.herokuapp.com/todos',
+        url: 'http://localhost:3000/todos',
         headers: {
           'token': localStorage.token
         }
       })
         .then(response => {
-          console.log('-----response',response.data)
           self.name = response.data.user.name
           self.todos = response.data.user.todos
-          console.log('before sort', self.todos)
           self.todos.sort((a, b) => {
             return new Date(a.createdAt) - new Date(b.createdAt)
           })
-          console.log('after sort', self.todos)
         })
       .catch(err => {
         handlingErr(err)
@@ -92,7 +97,7 @@ export default {
     addNewTodo () {
       let self = this
       axios({
-        url: 'https://powerful-refuge-28791.herokuapp.com/todos/add',
+        url: 'http://localhost:3000/todos/add',
         method: 'post',
         data: {
           title: self.newTitle,
@@ -114,7 +119,7 @@ export default {
     completeTodo (todoId) {
       let self = this
       axios({
-        url: 'https://powerful-refuge-28791.herokuapp.com/todos/complete',
+        url: 'http://localhost:3000/todos/complete',
         method: 'put',
         data: {
           token: localStorage.token,
@@ -133,7 +138,7 @@ export default {
     deleteTodo (todoId) {
       let self = this
       axios({
-        url: `https://powerful-refuge-28791.herokuapp.com/todos/delete?todoId=${todoId}`,
+        url: `http://localhost:3000/todos/delete?todoId=${todoId}`,
         method: 'delete',
         headers: {
           'token': localStorage.token

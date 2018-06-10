@@ -3,7 +3,7 @@
     <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
     <Navbar 
       :status="isLogin"
-      @loginFb="loginFb"
+      @login="login"
       />
     <Welcome/>
   </div>
@@ -16,12 +16,14 @@ import Navbar from '@/components/Navbar.vue'
 import Welcome from '@/components/Welcome.vue'
 import axios from 'axios'
 import { getFbAPI } from '@/assets/js/fbApi.js'
+import { firebase, providerFB } from '@/assets/js/firebase.js'
 
 export default {
   name: 'home',
   data () {
     return {
-      isLogin: false
+      isLogin: false,
+      user: {}
     }
   },
   components: {
@@ -30,44 +32,65 @@ export default {
     Welcome
   },
   methods: {
+    login (e) {
+      switch (e) {
+        case 'fb':
+          this.loginFb()
+          break;
+      
+        default:
+          break;
+      }
+    },
+
     loginFb () {
       let self = this
-      FB.getLoginStatus(function (response) {
-        if (response.status !== 'connected') {
-          FB.login(function () {})
-        }
-        console.log('logged in FB')
-        getFbAPI(function (profile) {
-          console.log('----after fb api', profile)
-          axios
-            .post(
-              'https://powerful-refuge-28791.herokuapp.com/users/signin',
-              {
-                isFb: true,
-                name: profile.name,
-                email: profile.email
-              }
-            )
-            .then(response => {
-              console.log(response)
-              localStorage.token = response.data.token
-              self.$router.push({name: 'todos'})
-            })
-            .catch(err => {
-              if (err.response) {
-                console.log(err.response)
-              } else if (err.request) {
-                console.log(err.request)
-              } else {
-                console.log(err.message)
-              }
-            })
+
+      firebase
+        .auth().signInWithPopup(providerFB)
+        .then(result => {
+          let token = result.credential.accessToken
+          self.user = { 
+            name: result.user.displayName,
+            email: result.user.email,
+            socmedId: result.user.uid
+          }
+          self.loginBySocmed()
         })
+        .catch(err => {
+          // Handle Errors here.
+          let errorCode = err.code;
+          let errorMessage = err.message;
+          // The email of the user's account used.
+          let email = err.email;
+          // The firebase.auth.AuthCredential type that was used.
+          let credential = err.credential;
+          console.log('error code', errorCode)
+          console.log('errorMessage', errorMessage)
+        })
+    },
+
+    loginBySocmed () {
+      this.user.isSocmed = true
+      let self = this
+      axios({
+        url: 'http://localhost:3000/users/signin',
+        method: 'post',
+        data: self.user
+      })
+      .then(({data}) => {
+        console.log(data)
+        localStorage.setItem('token', data.token)
+        this.$router.push({name: 'todos'})
+      })
+      .catch(err => {
+        console.log('error',err)
       })
     }
   },
   created () {
-    if (localStorage.token) {
+    let token = localStorage.getItem('token')
+    if (token) {
       this.isLogin = true
       this.$router.push({name: 'todos'})
     }
