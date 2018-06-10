@@ -14,6 +14,11 @@
         <!-- <label for="newDesc">Desc:</label> -->
         <b-form-input id="newDesc" v-model="newDesc" placeholder="enter todo description"/>
       </div>
+      <div class="mx-auto mb-2">
+        <label for="newDate" class="text-left">Remind me at:</label>
+        <b-form-input id="newDate" class="mb-2" v-model="newDate" type="date"/>
+        <b-form-input id="newTime" v-model="newTime" type="time"/>
+      </div>
       <b-button variant="primary" @click="addNewTodo">Submit</b-button>
 
     </b-form>
@@ -67,7 +72,9 @@ export default {
       name: '',
       todos: [],
       newTitle: '',
-      newDesc: ''
+      newDesc: '',
+      newDate: '',
+      newTime: ''
     }
   },
 
@@ -96,13 +103,20 @@ export default {
 
     addNewTodo () {
       let self = this
+      console.log(this.newDate)
       axios({
         url: 'http://localhost:3000/todos/add',
         method: 'post',
         data: {
           title: self.newTitle,
           desc: self.newDesc,
-          token: localStorage.token
+          reminder: {
+            date: self.newDate,
+            time: self.newTime
+          }
+        },
+        headers: {
+          token: localStorage.getItem('token')
         }
       })
         .then(response => {
