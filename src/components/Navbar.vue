@@ -7,14 +7,14 @@
 
     <b-collapse is-nav id="nav_collapse">
 
-      <b-nav-form>
+      <!-- <b-nav-form>
         <b-form-input size="sm" class="mr-sm-auto" type="text" placeholder="Search"/>
         <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
-      </b-nav-form>
+      </b-nav-form> -->
 
       <!-- Right aligned nav items -->
       <b-navbar-nav class="ml-auto">
-        <b-nav-item v-if="!status" @click="$emit('loginFb')"> Login <i class="fa fa-facebook-f"></i> </b-nav-item>
+        <b-nav-item v-if="!status" @click="$emit('login', 'fb')"> Login <i class="fa fa-facebook-f"></i> </b-nav-item>
         <b-nav-item v-else-if="status" @click="logout"> Logout </b-nav-item>
       </b-navbar-nav>
 
@@ -30,7 +30,7 @@ export default {
 
   methods: {
     logout () {
-      delete localStorage.token
+      localStorage.removeItem('token')
       this.$router.push('/')
     }
   }

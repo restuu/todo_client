@@ -21,7 +21,8 @@ export default {
   },
 
   created () {
-    if (!localStorage.token) {
+    let token = localStorage.getItem('token')
+    if (!token) {
       alert('please login first')
       this.$router.push({name: 'home'})
     } 
