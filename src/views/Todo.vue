@@ -1,7 +1,9 @@
 <template>
   <div id="todo">
     <Navbar :status="true"/>
-    <List/>
+    <div class="">
+      <List/>
+    </div>
   </div>
 </template>
 
