@@ -2,7 +2,6 @@
   <div class="list container">
 
     <h3 class="mt-3"> Welcome {{ name }} </h3>
-    <p v-if="todos.length === 0"> You don't have any todo list yet </p>
 
     <div class="row" style="border: 1px solid red">
 
@@ -28,43 +27,67 @@
           <a href="" @click.prevent="showSetReminder = true" v-else>show time setting</a>
         </div>
 
-        <b-button variant="primary" @click="addNewTodo">Submit</b-button>
+        <div class="mx-auto mb-2" v-show="showSetLoc">
+          <label for="location" class="text-left">Where :</label>
+          <b-form-input id="location" list="loc-list" class="mb-2" v-model.lazy="location"/>
+          <datalist id="loc-list">
+            <option v-for="city in cities" :key="city.id" :value="city.name"></option>
+          </datalist>
+          {{ getCityId }}
+        </div>
+
+        <div class="mb-4">
+          <a href="" @click.prevent="showSetLoc = false" v-if="showSetLoc">hide</a>
+          <a href="" @click.prevent="showSetLoc = true" v-else>show loc setting</a>
+        </div>
+
+        <b-button variant="success" @click="addNewTodo">Submit</b-button>
 
       </b-form>
       <!-- form -->
 
       <div id="todo-list" class="mt-3 col-sm-5 offset-sm-2" style="border: 1px solid purple">
-        
-        <div id="note" v-show="todos.length > 0">
-          <small class="text-muted">mark task as complete before delete</small> <br>
-          <small class="text-muted">click on task title to mark as complete</small>
+
+        <div class="d-flex justify-content-center">
+          <p v-if="todos.length === 0"> You don't have any todo list yet </p>
+        </div>
+
+        <div>
+          <div id="note" v-show="todos.length > 0">
+            <small class="text-muted">mark task as complete before delete</small> <br>
+            <small class="text-muted">click on task title to mark as complete</small>
+          </div>
+          
+          <b-list-group class="" v-for="todo in todos" :key="todo._id" >
+
+            <b-list-group-item 
+              class="col-sm-12 mx-auto mb-2 text-left"
+              :class="{ completed: todo.isCompleted }"
+              > 
+
+              <div>
+                <h5 @click="completeTodo(todo._id)">
+                  {{ todo.title }} 
+                  <b-btn 
+                    class="float-right" 
+                    size="sm" 
+                    @click="deleteTodo(todo._id)"
+                    v-show="todo.isCompleted"
+                    >delete</b-btn>
+                </h5>
+              </div>
+
+              <div>
+                <small class="text-muted">{{ todo.desc }}</small> <br>
+                <date-time :date="todo.remindAt.date" :time="todo.remindAt.time"/>
+              </div>
+
+            </b-list-group-item>
+
+          </b-list-group>
+
         </div>
         
-        <b-list-group class="" v-for="todo in todos" :key="todo._id" >
-
-          <b-list-group-item 
-            class="col-sm-12 mx-auto mb-2 text-left"
-            :class="{ completed: todo.isCompleted }"
-            > 
-
-            <div>
-              <h5 @click="completeTodo(todo._id)">
-                {{ todo.title }} 
-                <b-btn 
-                  class="float-right" 
-                  size="sm" 
-                  @click="deleteTodo(todo._id)"
-                  v-show="todo.isCompleted"
-                  >delete</b-btn>
-              </h5>
-            </div>
-
-            <small class="text-muted">{{ todo.desc }}</small>
-
-          </b-list-group-item>
-
-        </b-list-group>
-
       </div>
 
     </div>
@@ -75,6 +98,8 @@
 
 <script>
 import axios from 'axios'
+import DateTime from './DateTime.vue'
+import cities from '@/assets/json/city.list.json'
 
 let handlingErr = function (err) {
   if (err.response) {
@@ -89,6 +114,10 @@ let handlingErr = function (err) {
 }
 
 export default {
+  components: {
+    DateTime
+  },
+
   data () {
     return {
       name: '',
@@ -97,10 +126,22 @@ export default {
       newDesc: '',
       newDate: '',
       newTime: '',
-      showSetReminder: false
+      showSetReminder: false,
+      reminder: '',
+      showSetLoc: false,
+      cities: [],
+      location: ''
     }
   },
 
+  computed: {
+    getCityId () {
+      let city = this.cities.filter(city => city.name === this.location)
+      if (city[0]) {
+        return city[0].id
+      }
+    }
+  },
 
   methods: {
     getTodos () {
@@ -127,6 +168,7 @@ export default {
     addNewTodo () {
       let self = this
       console.log(this.newDate)
+      console.log(this.location)
       axios({
         url: 'http://localhost:3000/todos/add',
         method: 'post',
@@ -136,7 +178,8 @@ export default {
           reminder: {
             date: self.newDate,
             time: self.newTime
-          }
+          },
+          locId: self.getCityId
         },
         headers: {
           token: localStorage.getItem('token')
@@ -190,17 +233,27 @@ export default {
 
     hide () {
 
+    },
+
+    fetchIdCities () {
+      let citiesID = [...cities].filter(el => el.country === 'ID')
+      citiesID = citiesID.filter(el => !/provinsi/gi.test(el.name))
+      citiesID.sort(function (a, b) {
+        return a.name > b.name
+      })
+      this.cities = citiesID
     }
   },
 
   created () {
     this.getTodos()
+    this.fetchIdCities()
   }
 }
 </script>
 
 
-<style lang="scss">
+<style lang="scss" scoped>
 
   .list {
     max-width: 50rem;
@@ -210,5 +263,11 @@ export default {
   .completed {
     text-decoration: line-through;
     text-decoration-color: red;
+  }
+
+  .list-group-item.completed:hover {
+    z-index: 1;
+    text-decoration: line-through;
+    text-decoration-color: red
   }
 </style>
