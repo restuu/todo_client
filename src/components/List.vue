@@ -33,7 +33,6 @@
           <datalist id="loc-list">
             <option v-for="city in cities" :key="city.id" :value="city.name"></option>
           </datalist>
-          {{ getCityId }}
         </div>
 
         <div class="mb-4">
@@ -61,7 +60,7 @@
           <b-list-group class="" v-for="todo in todos" :key="todo._id" >
 
             <b-list-group-item 
-              class="col-sm-12 mx-auto mb-2 text-left"
+              class="col-sm-12 mx-auto mb-2 text-left pr-0"
               :class="{ completed: todo.isCompleted }"
               > 
 
@@ -69,7 +68,7 @@
                 <h5 @click="completeTodo(todo._id)">
                   {{ todo.title }} 
                   <b-btn 
-                    class="float-right" 
+                    class="float-right mr-4" 
                     size="sm" 
                     @click="deleteTodo(todo._id)"
                     v-show="todo.isCompleted"
@@ -77,9 +76,10 @@
                 </h5>
               </div>
 
-              <div>
-                <small class="text-muted">{{ todo.desc }}</small> <br>
-                <date-time :date="todo.remindAt.date" :time="todo.remindAt.time"/>
+              <div class="row">
+                <small v-show="todo.desc" class="text-muted col-12">{{ todo.desc }}</small>
+                <date-time :date="todo.remindAt.date" :time="todo.remindAt.time" class="col-12"/>
+                <loc-and-weather :city="todo.locAndWeather.city" :weathers="todo.locAndWeather.list" class="col-12"/>
               </div>
 
             </b-list-group-item>
@@ -100,6 +100,7 @@
 import axios from 'axios'
 import DateTime from './DateTime.vue'
 import cities from '@/assets/json/city.list.json'
+import LocAndWeather from './LocAndWeather.vue'
 
 let handlingErr = function (err) {
   if (err.response) {
@@ -115,7 +116,8 @@ let handlingErr = function (err) {
 
 export default {
   components: {
-    DateTime
+    DateTime,
+    LocAndWeather
   },
 
   data () {
@@ -189,6 +191,9 @@ export default {
           console.log(response.data)
           self.newTitle = ''
           self.newDesc = ''
+          self.newDate = ''
+          self.newTime = ''
+          self.location = ''
           self.getTodos()
         })
       .catch(err => {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    {{getDateTime}}
+    <small>{{getDateTime}}</small>
   </div>
 </template>
 
@@ -10,7 +10,10 @@ export default {
   computed: {
     getDateTime () {
       if (this.time.length === 0 && this.date !== null) {
-        return new Date(this.date).toDateString()
+        let a = new Date(this.date)
+        a = a.toLocaleString().split(' ')[0]
+        a = a.slice(0, a.length - 1)
+        return a
       } else if (this.date === null) {
         return
       }
