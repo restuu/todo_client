@@ -3,9 +3,9 @@
 
     <h3 class="mt-3"> Welcome {{ name }} </h3>
 
-    <div class="row" style="border: 1px solid red">
+    <div class="row">
 
-      <b-form class="mt-3 col-sm-5" style="border: 1px solid yellow">
+      <b-form class="mt-3 col-sm-5">
 
         <div class="mx-auto mb-2">
           <!-- <label for="newTitle">Title:</label> -->
@@ -45,7 +45,7 @@
       </b-form>
       <!-- form -->
 
-      <div id="todo-list" class="mt-3 col-sm-5 offset-sm-2" style="border: 1px solid purple">
+      <div id="todo-list" class="mt-3 col-sm-5 offset-sm-2">
 
         <div class="d-flex justify-content-center">
           <p v-if="todos.length === 0"> You don't have any todo list yet </p>

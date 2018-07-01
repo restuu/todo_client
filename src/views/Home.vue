@@ -53,7 +53,7 @@ export default {
           self.user = { 
             name: result.user.displayName,
             email: result.user.email,
-            socmedId: result.user.uid
+            socmedId: result.user.providerData[0].uid
           }
           self.loginBySocmed()
         })
