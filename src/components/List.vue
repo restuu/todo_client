@@ -104,9 +104,9 @@ import LocAndWeather from './LocAndWeather.vue'
 
 let handlingErr = function (err) {
   if (err.response) {
-    console.log(error.response.data)
-    console.log(error.response.status)
-    console.log(error.response.headers)
+    console.log(err.response.data)
+    console.log(err.response.status)
+    console.log(err.response.headers)
   } else if (err.request) {
     console.log(err.request)
   } else {
@@ -150,7 +150,7 @@ export default {
       let self = this
       axios({
         method: 'get',
-        url: 'https://api-todo.restuutomo.me/todos',
+        url: 'http://localhost:3000/todos',
         headers: {
           'token': localStorage.token
         }
@@ -172,7 +172,7 @@ export default {
       console.log(this.newDate)
       console.log(this.location)
       axios({
-        url: 'https://api-todo.restuutomo.me/todos/add',
+        url: 'http://localhost:3000/todos/add',
         method: 'post',
         data: {
           title: self.newTitle,
@@ -204,7 +204,7 @@ export default {
     completeTodo (todoId) {
       let self = this
       axios({
-        url: 'https://api-todo.restuutomo.me/todos/complete',
+        url: 'http://localhost:3000/todos/complete',
         method: 'put',
         data: {
           token: localStorage.token,
@@ -223,7 +223,7 @@ export default {
     deleteTodo (todoId) {
       let self = this
       axios({
-        url: `https://api-todo.restuutomo.me/todos/delete?todoId=${todoId}`,
+        url: `http://localhost:3000/todos/delete?todoId=${todoId}`,
         method: 'delete',
         headers: {
           'token': localStorage.token
@@ -241,12 +241,17 @@ export default {
     },
 
     fetchIdCities () {
-      let citiesID = [...cities].filter(el => el.country === 'ID')
-      citiesID = citiesID.filter(el => !/provinsi/gi.test(el.name))
-      citiesID.sort(function (a, b) {
-        return a.name > b.name
+      let self = this
+      axios({
+        url: `http://localhost:3000/cities`,
+        method: 'get'
       })
-      this.cities = citiesID
+      .then(({ data }) => {
+        console.log(data)
+        self.cities = data.cities
+        console.log(self.cities)
+      })
+      .catch(err => handlingErr(err))
     }
   },
 
