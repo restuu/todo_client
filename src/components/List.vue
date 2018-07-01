@@ -150,7 +150,7 @@ export default {
       let self = this
       axios({
         method: 'get',
-        url: 'http://localhost:3000/todos',
+        url: 'https://api-todo.restuutomo.me/todos',
         headers: {
           'token': localStorage.token
         }
@@ -172,7 +172,7 @@ export default {
       console.log(this.newDate)
       console.log(this.location)
       axios({
-        url: 'http://localhost:3000/todos/add',
+        url: 'https://api-todo.restuutomo.me/todos/add',
         method: 'post',
         data: {
           title: self.newTitle,
@@ -204,7 +204,7 @@ export default {
     completeTodo (todoId) {
       let self = this
       axios({
-        url: 'http://localhost:3000/todos/complete',
+        url: 'https://api-todo.restuutomo.me/todos/complete',
         method: 'put',
         data: {
           token: localStorage.token,
@@ -223,7 +223,7 @@ export default {
     deleteTodo (todoId) {
       let self = this
       axios({
-        url: `http://localhost:3000/todos/delete?todoId=${todoId}`,
+        url: `https://api-todo.restuutomo.me/todos/delete?todoId=${todoId}`,
         method: 'delete',
         headers: {
           'token': localStorage.token

@@ -74,7 +74,7 @@ export default {
       this.user.isSocmed = true
       let self = this
       axios({
-        url: 'http://localhost:3000/users/signin',
+        url: 'https://api-todo.restuutomo.me/users/signin',
         method: 'post',
         data: self.user
       })
