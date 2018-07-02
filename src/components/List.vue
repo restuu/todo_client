@@ -99,7 +99,6 @@
 <script>
 import axios from 'axios'
 import DateTime from './DateTime.vue'
-import cities from '@/assets/json/city.list.json'
 import LocAndWeather from './LocAndWeather.vue'
 
 let handlingErr = function (err) {
